@@ -1,0 +1,28 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Source Sans 3", "Inter", system-ui, sans-serif;
+}
+
+/* Drop-Zonen für Tile-Drag-and-Drop */
+.tile-drop-zone {
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+body.tile-drag-active .tile-drop-zone {
+  opacity: 0.5;
+}
+
+body.tile-drag-active .tile-drop-zone.is-drop-target {
+  opacity: 1;
+}
+
+body.tile-drag-active {
+  cursor: grabbing;
+  user-select: none;
+}
