@@ -43,135 +43,45 @@ export function MobileFrame({
   const scale = zoomLevel / 100;
   const isZoomed = scale !== 1;
 
-  const innerContent = (
+  const headerEl = (
+    <header
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '16px 20px',
+        paddingTop: 48,
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+        flexShrink: 0,
+      }}
+    >
+      <button style={{ background: 'none', border: 'none', color: TEXT_COLOR, cursor: 'pointer', padding: 8 }} aria-label="Zurück">
+        <ChevronLeft size={28} strokeWidth={2} />
+      </button>
+      <h1 style={{ fontSize: 18, fontWeight: 700, color: TEXT_COLOR, margin: 0 }}>{pageTitle}</h1>
+      <button style={{ background: 'none', border: 'none', color: TEXT_COLOR, cursor: 'pointer', padding: 8 }} aria-label="Menü">
+        <MoreVertical size={24} strokeWidth={2} />
+      </button>
+    </header>
+  );
+
+  const scrollableContent = (
     <>
-      <header
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '16px 20px',
-          paddingTop: 48,
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
-          flexShrink: 0,
-        }}
-      >
-        <button
-          style={{
-            background: 'none',
-            border: 'none',
-            color: TEXT_COLOR,
-            cursor: 'pointer',
-            padding: 8,
-          }}
-          aria-label="Zurück"
-        >
-          <ChevronLeft size={28} strokeWidth={2} />
-        </button>
-        <h1
-          style={{
-            fontSize: 18,
-            fontWeight: 700,
-            color: TEXT_COLOR,
-            margin: 0,
-          }}
-        >
-          {pageTitle}
-        </h1>
-        <button
-          style={{
-            background: 'none',
-            border: 'none',
-            color: TEXT_COLOR,
-            cursor: 'pointer',
-            padding: 8,
-          }}
-          aria-label="Menü"
-        >
-          <MoreVertical size={24} strokeWidth={2} />
-        </button>
-      </header>
-
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          minWidth: 0,
-          overflow: 'auto',
-          paddingBottom: 24,
-        }}
-      >
-        {lifeStages.length > 0 && (
-          <LifeStageSelector
-            lifeStages={lifeStages}
-            selectedId={selectedLifeStageId}
-            onSelect={onSelectLifeStage}
-          />
-        )}
+      <div style={{ flex: 1, minHeight: 0, minWidth: 0, overflow: 'auto', paddingBottom: 24 }}>
+        {lifeStages.length > 0 && <LifeStageSelector lifeStages={lifeStages} selectedId={selectedLifeStageId} onSelect={onSelectLifeStage} />}
         <section style={{ paddingTop: lifeStages.length > 0 ? 0 : 24 }}>
-          <h2
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: TEXT_COLOR,
-              opacity: 0.9,
-              margin: '0 16px 12px',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
-            }}
-          >
-            Aktuell für Sie hilfreich
-          </h2>
-          <TileGrid
-            tiles={helpfulTiles}
-            expandedTileId={expandedTileId}
-            onToggle={handleToggle}
-          />
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: TEXT_COLOR, opacity: 0.9, margin: '0 16px 12px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Aktuell für Sie hilfreich</h2>
+          <TileGrid tiles={helpfulTiles} expandedTileId={expandedTileId} onToggle={handleToggle} zoomLevel={zoomLevel} />
         </section>
-
         <section style={{ paddingTop: 24 }}>
-          <h2
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: TEXT_COLOR,
-              opacity: 0.9,
-              margin: '0 16px 12px',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
-            }}
-          >
-            Weitere Angebote
-          </h2>
-          <TileGrid
-            tiles={offersTiles}
-            expandedTileId={expandedTileId}
-            onToggle={handleToggle}
-          />
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: TEXT_COLOR, opacity: 0.9, margin: '0 16px 12px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Weitere Angebote</h2>
+          <TileGrid tiles={offersTiles} expandedTileId={expandedTileId} onToggle={handleToggle} zoomLevel={zoomLevel} />
         </section>
-
         <section style={{ paddingTop: 24 }}>
-          <h2
-            style={{
-              fontSize: 14,
-              fontWeight: 600,
-              color: TEXT_COLOR,
-              opacity: 0.9,
-              margin: '0 16px 12px',
-              textTransform: 'uppercase',
-              letterSpacing: 0.5,
-            }}
-          >
-            Wissenswertes
-          </h2>
-          <TileGrid
-            tiles={wissenswertesTiles}
-            expandedTileId={expandedTileId}
-            onToggle={handleToggle}
-          />
+          <h2 style={{ fontSize: 14, fontWeight: 600, color: TEXT_COLOR, opacity: 0.9, margin: '0 16px 12px', textTransform: 'uppercase', letterSpacing: 0.5 }}>Wissenswertes</h2>
+          <TileGrid tiles={wissenswertesTiles} expandedTileId={expandedTileId} onToggle={handleToggle} zoomLevel={zoomLevel} />
         </section>
       </div>
-
       <BottomNav />
     </>
   );
@@ -191,37 +101,26 @@ export function MobileFrame({
         flexDirection: 'column',
       }}
     >
+      {headerEl}
       {isZoomed ? (
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            overflow: 'auto',
-          }}
-        >
-          <div
-            style={{
-              width: width * scale,
-              minHeight: height * scale,
-              flexShrink: 0,
-            }}
-          >
+        <div style={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
+          <div style={{ width: width * scale, minHeight: (height - 120) * scale, flexShrink: 0 }}>
             <div
               style={{
                 width: width,
-                height: height,
+                minHeight: height - 120,
                 transform: `scale(${scale})`,
                 transformOrigin: 'top left',
                 display: 'flex',
                 flexDirection: 'column',
               }}
             >
-              {innerContent}
+              {scrollableContent}
             </div>
           </div>
         </div>
       ) : (
-        innerContent
+        scrollableContent
       )}
     </div>
   );

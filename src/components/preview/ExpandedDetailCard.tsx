@@ -1,4 +1,4 @@
-import { Share2, ChevronUp } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import type { Tile } from '../../types/page';
 
 const BG_COLOR = '#152a24';
@@ -8,45 +8,37 @@ const TEXT_COLOR = '#ffffff';
 interface ExpandedDetailCardProps {
   tile: Tile;
   onClose: () => void;
+  zoomLevel?: number;
 }
 
-export function ExpandedDetailCard({ tile, onClose }: ExpandedDetailCardProps) {
+export function ExpandedDetailCard({ tile, onClose, zoomLevel = 100 }: ExpandedDetailCardProps) {
+  const isZoomed = zoomLevel >= 125;
+  const padding = isZoomed ? 20 : 16;
+  const marginBottom = isZoomed ? 24 : 20;
+  const titleFontSize = zoomLevel >= 150 ? 17 : zoomLevel >= 125 ? 16.5 : 16;
+  const descFontSize = zoomLevel >= 150 ? 15 : zoomLevel >= 125 ? 14.5 : 14;
   return (
     <div
       style={{
         borderRadius: 18,
         backgroundColor: BG_COLOR,
-        padding: 16,
-        margin: '0 16px 20px',
+        padding,
+        margin: `0 0 ${marginBottom}px`,
         position: 'relative',
         boxSizing: 'border-box',
         maxWidth: '100%',
       }}
     >
-      <div
-        style={{
-          position: 'absolute',
-          top: 16,
-          right: 16,
-          display: 'flex',
-          alignItems: 'center',
-          gap: 12,
-        }}
-      >
-        <button
-          onClick={onClose}
+      {tile.shareEnabled && (
+        <div
           style={{
-            background: 'none',
-            border: 'none',
-            color: TEXT_COLOR,
-            cursor: 'pointer',
-            padding: 4,
+            position: 'absolute',
+            top: 16,
+            right: 16,
+            display: 'flex',
+            alignItems: 'center',
           }}
-          aria-label="Zuklappen"
         >
-          <ChevronUp size={22} strokeWidth={2} />
-        </button>
-        {tile.shareEnabled && (
           <button
             style={{
               background: 'none',
@@ -59,17 +51,17 @@ export function ExpandedDetailCard({ tile, onClose }: ExpandedDetailCardProps) {
           >
             <Share2 size={20} strokeWidth={2} />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {tile.expandedTitle && (
         <div
           style={{
             fontWeight: 600,
-            fontSize: 16,
+            fontSize: titleFontSize,
             color: TEXT_COLOR,
             marginBottom: 12,
-            paddingRight: 56,
+            paddingRight: tile.shareEnabled ? 40 : 0,
           }}
         >
           {tile.expandedTitle}
@@ -79,11 +71,13 @@ export function ExpandedDetailCard({ tile, onClose }: ExpandedDetailCardProps) {
       {tile.description && (
         <div
           style={{
-            fontSize: 14,
+            fontSize: descFontSize,
             color: TEXT_COLOR,
             opacity: 0.9,
             lineHeight: 1.5,
             marginBottom: 16,
+            overflowWrap: 'break-word',
+            wordBreak: 'break-word',
           }}
         >
           {tile.description}
@@ -91,21 +85,32 @@ export function ExpandedDetailCard({ tile, onClose }: ExpandedDetailCardProps) {
       )}
 
       {tile.buttonEnabled && tile.buttonText && (
-        <button
-          onClick={(e) => e.stopPropagation()}
+        <div
           style={{
-            backgroundColor: CTA_COLOR,
-            color: '#000',
-            border: 'none',
-            borderRadius: 12,
-            padding: '14px 20px',
-            fontWeight: 600,
-            fontSize: 15,
-            cursor: 'pointer',
+            marginTop: 4,
+            containerType: 'inline-size',
+            width: '100%',
           }}
         >
-          {tile.buttonText}
-        </button>
+          <button
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: CTA_COLOR,
+              color: '#000',
+              border: 'none',
+              borderRadius: 12,
+              padding: isZoomed ? '16px 24px' : '14px 20px',
+              fontWeight: 600,
+              fontSize: 'clamp(11px, 4cqi, 16px)',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            {tile.buttonText}
+          </button>
+        </div>
       )}
     </div>
   );

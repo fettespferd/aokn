@@ -30,9 +30,9 @@ export const initialPageData: PageData = {
       createTile('tile-family-insurance', 'helpful', {
         title: 'Familienversicherung',
         icon: 'FileText',
-        expandedTitle: 'Informationen zur Familienversicherung',
+        expandedTitle: 'Ihr Kind kostenlos mitversichern',
         description:
-          'Als Mitglied der AOK können Sie Ihr Kind kostenlos in der Familienversicherung mitversichern – ohne zusätzliche Beiträge.',
+          'Als AOK-Mitglied können Sie Ihr Neugeborenes kostenlos in der Familienversicherung mitversichern – ohne zusätzliche Beiträge. Melden Sie Ihr Kind innerhalb von zwei Monaten nach der Geburt an.',
         buttonEnabled: true,
         buttonText: 'Mehr zur Familienversicherung',
         buttonActionType: 'link',
@@ -44,9 +44,9 @@ export const initialPageData: PageData = {
       createTile('tile-hebamme', 'helpful', {
         title: 'AOK-Hebammensuche',
         icon: 'HeartHandshake',
-        expandedTitle: 'Hebamme in Ihrer Nähe finden',
+        expandedTitle: 'Wie funktioniert die AOK Hebammensuche?',
         description:
-          'Eine Hebamme begleitet Sie während der Schwangerschaft, bei der Geburt und im Wochenbett. Mit unserer Suche finden Sie freie Hebammen in Ihrer Region.',
+          'Eine Hebamme begleitet Sie während der Schwangerschaft, bei der Geburt und im Wochenbett. Sie hilft beim Stillen, bei der Rückbildung und bei allen Fragen rund ums Baby. Mit unserer Suche finden Sie freie Hebammen in Ihrer Region – die Kosten übernimmt die AOK.',
         buttonEnabled: true,
         buttonText: 'Zur Hebammensuche',
         buttonActionType: 'link',
@@ -60,7 +60,7 @@ export const initialPageData: PageData = {
         icon: 'HousePlus',
         expandedTitle: 'Klinik, Geburtshaus oder Hausgeburt?',
         description:
-          'Die Wahl des Geburtsorts ist eine wichtige Entscheidung. Wir informieren Sie über die verschiedenen Möglichkeiten und was Sie bei der Auswahl beachten sollten.',
+          'Klinik mit Vollversorgung, Geburtshaus oder Hausgeburt – jede Option hat Vor- und Nachteile. Wir erklären, was Sie bei der Wahl beachten sollten, welche Kosten übernommen werden und wie Sie rechtzeitig einen Platz finden.',
         buttonEnabled: true,
         buttonText: 'Geburtsorte vergleichen',
         buttonActionType: 'link',
@@ -74,7 +74,7 @@ export const initialPageData: PageData = {
         icon: 'FileText',
         expandedTitle: 'Mutterschaftsgeld beantragen',
         description:
-          'Als Arbeitnehmerin haben Sie Anspruch auf Mutterschaftsgeld. Wir erklären, wie Sie den Antrag stellen und welche Unterlagen Sie benötigen.',
+          'Sechs Wochen vor und acht Wochen nach der Geburt haben Sie Anspruch auf Mutterschutz. Das Mutterschaftsgeld gleicht die Differenz zu Ihrem Nettogehalt aus. Antrag stellen Sie bei der AOK – am besten schon vor der Geburt.',
         buttonEnabled: true,
         buttonText: 'Antrag stellen',
         buttonActionType: 'link',
@@ -86,9 +86,9 @@ export const initialPageData: PageData = {
       createTile('tile-prenatal', 'helpful', {
         title: 'Vorsorgeuntersuchungen',
         icon: 'Baby',
-        expandedTitle: 'Vorsorgeuntersuchungen für Ihr Kind',
+        expandedTitle: 'U1 bis U3 – Die ersten Vorsorgeuntersuchungen',
         description:
-          'Die U-Untersuchungen decken alle wichtigen Entwicklungsphasen ab. Die Kosten übernimmt die AOK vollständig.',
+          'Direkt nach der Geburt: U1 (Neugeborenen-Erstuntersuchung), U2 (3.–10. Lebenstag) und U3 (4.–5. Lebenswoche). Der Kinderarzt prüft Entwicklung, Reflexe und Organe. Die Kosten übernimmt die AOK vollständig.',
         buttonEnabled: true,
         buttonText: 'Alle U-Untersuchungen im Überblick',
         buttonActionType: 'link',
@@ -102,7 +102,7 @@ export const initialPageData: PageData = {
         icon: 'HeartHandshake',
         expandedTitle: 'Warum ist ein Rückbildungskurs sinnvoll?',
         description:
-          'Während der Schwangerschaft werden Beckenboden, Bauch und Rücken stark beansprucht. Im Rückbildungskurs lernen Sie gezielte Übungen zur Kräftigung.',
+          'Während der Schwangerschaft werden Beckenboden, Bauch und Rücken stark beansprucht. Der Rückbildungskurs startet frühestens sechs Wochen nach der Geburt. Sie lernen gezielte Übungen zur Kräftigung – die AOK übernimmt die Kosten für bis zu 14 Stunden.',
         buttonEnabled: true,
         buttonText: 'Informationen zum Rückbildungskurs',
         buttonActionType: 'link',
@@ -117,7 +117,7 @@ export const initialPageData: PageData = {
         icon: 'Search',
         expandedTitle: 'Kinderarzt oder Kinderärztin in Ihrer Nähe finden',
         description:
-          'Mit unserer Arztsuche finden Sie schnell einen Kinderarzt in Ihrer Umgebung. Viele Praxen bieten auch Online-Terminbuchung an.',
+          'Für die U2 und U3 brauchen Sie einen Kinderarzt. Mit unserer Arztsuche finden Sie schnell eine Praxis in Ihrer Umgebung. Viele bieten auch Online-Terminbuchung an. Am besten melden Sie sich frühzeitig an – manche Praxen haben lange Wartelisten.',
         buttonEnabled: true,
         buttonText: 'Zur Kinderarztsuche',
         buttonActionType: 'link',
@@ -175,7 +175,7 @@ export const initialPageData: PageData = {
         icon: 'Phone',
         expandedTitle: 'Beratung am Kinder- und Babytelefon',
         description:
-          'Bei Fragen zur Gesundheit und Entwicklung Ihres Kindes stehen Ihnen unsere Experten zur Verfügung. Die Hotline ist kostenlos und vertraulich.',
+          'Fieber, Trinkschwäche, Hautausschlag – bei Fragen zur Gesundheit Ihres Babys stehen Ihnen unsere Experten zur Verfügung. Die Hotline ist kostenlos und vertraulich. Auch nachts und am Wochenende erreichbar.',
         buttonEnabled: true,
         buttonText: 'Rufnummer und Öffnungszeiten',
         buttonActionType: 'link',
@@ -189,7 +189,7 @@ export const initialPageData: PageData = {
         icon: 'BadgePlus',
         expandedTitle: 'AOK Bonusprogramm – Belohnung für Ihre Gesundheit',
         description:
-          'Nehmen Sie an Vorsorgeuntersuchungen teil, absolvieren Sie einen Erste-Hilfe-Kurs am Kind oder nutzen Sie unsere Gesundheitskurse – und sammeln Sie Bonuspunkte.',
+          'U1 bis U9, Erste-Hilfe-Kurs am Kind, Rückbildungskurs – für jede erledigte Leistung gibt es Bonuspunkte. Diese können Sie in Prämien oder Beitragsrückerstattung umwandeln. Einfach in der AOK-App aktivieren.',
         buttonEnabled: true,
         buttonText: 'Zum Bonusprogramm',
         buttonActionType: 'link',
@@ -205,17 +205,45 @@ export const initialPageData: PageData = {
         icon: 'ShieldPlus',
         expandedTitle: 'Erste Hilfe bei Kindernotfällen',
         description:
-          'In Notfällen richtig handeln: Der Kurs vermittelt lebensrettende Maßnahmen bei Kindern. Oft Voraussetzung für die Kita-Anmeldung.',
+          'Verschlucken, Stürze, Fieberkrampf – in Notfällen richtig handeln. Der Kurs vermittelt lebensrettende Maßnahmen speziell für Säuglinge und Kleinkinder. Viele Eltern machen ihn schon in den ersten Monaten – die AOK übernimmt die Kosten.',
         buttonEnabled: true,
         buttonText: 'Kurse buchen',
         buttonActionType: 'link',
         buttonTarget: '/erste-hilfe-kind',
         shareEnabled: true,
-        lifeStageIds: ['ls-y2', 'ls-y3', 'ls-y4'],
+        lifeStageIds: ['ls-0-3', 'ls-4-6', 'ls-7-9', 'ls-10-12', 'ls-13-18', 'ls-19-24', 'ls-y2', 'ls-y3', 'ls-y4'],
         sortOrder: 2,
       }),
     ],
     wissenswertes: [
+      createTile('tile-stillen', 'wissenswertes', {
+        title: 'Stillen',
+        icon: 'Heart',
+        expandedTitle: 'Stillen – Tipps für den Start',
+        description:
+          'Stillen stärkt die Bindung und die Abwehrkräfte Ihres Kindes. Die ersten Tage sind oft herausfordernd – richtige Anlegetechnik, Milchstau vermeiden, Ernährung der stillenden Mutter. Wir geben praktische Tipps und verweisen auf Stillberatung.',
+        buttonEnabled: true,
+        buttonText: 'Still-Ratgeber',
+        buttonActionType: 'link',
+        buttonTarget: '/stillen',
+        shareEnabled: true,
+        lifeStageIds: ['ls-0-3', 'ls-4-6'],
+        sortOrder: -1,
+      }),
+      createTile('tile-wochenbett', 'wissenswertes', {
+        title: 'Wochenbett',
+        icon: 'Heart',
+        expandedTitle: 'Die ersten Wochen nach der Geburt',
+        description:
+          'Acht Wochen Mutterschutz – Zeit für Sie und Ihr Baby. Wir erklären, was Sie beachten sollten: Nachsorge durch die Hebamme (bis zu 16 Stunden), Rückbildung, Bonding. Auch Tipps bei Babyblues und wann Sie wieder Sport treiben können.',
+        buttonEnabled: true,
+        buttonText: 'Wochenbett-Guide',
+        buttonActionType: 'link',
+        buttonTarget: '/wochenbett',
+        shareEnabled: true,
+        lifeStageIds: ['ls-0-3'],
+        sortOrder: -0.5,
+      }),
       createTile('tile-beikost', 'wissenswertes', {
         title: 'Beikost einführen',
         icon: 'Baby',
@@ -249,7 +277,7 @@ export const initialPageData: PageData = {
         icon: 'BookOpen',
         expandedTitle: 'Schlafen lernen – Tipps für erholsame Nächte',
         description:
-          'Jedes Kind hat sein eigenes Schlafverhalten. Wir geben Tipps für eine ruhige Schlafumgebung und sanfte Einschlafrituale.',
+          'Neugeborene schlafen noch unregelmäßig, der Rhythmus entwickelt sich in den ersten Monaten. Wir geben Tipps: sichere Schlafumgebung (Rückenlage, kein Kopfkissen), sanfte Einschlafrituale, Tag-Nacht-Unterscheidung. Geduld hilft – jedes Kind ist anders.',
         buttonEnabled: true,
         buttonText: 'Schlaf-Tipps für Eltern',
         buttonActionType: 'link',

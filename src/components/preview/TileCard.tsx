@@ -7,16 +7,20 @@ const BG_OFFERS = '#333e3e';
 const BG_WISSENSWERTES = '#2d3d4e';
 const TEXT_COLOR = '#ffffff';
 
-const TILE_HEIGHT = 140;
-
 interface TileCardProps {
   tile: Tile;
   isExpanded: boolean;
   onToggle: () => void;
+  zoomLevel?: number;
 }
 
-export function TileCard({ tile, isExpanded, onToggle }: TileCardProps) {
+export function TileCard({ tile, isExpanded, onToggle, zoomLevel = 100 }: TileCardProps) {
   const Icon = getIconComponent(tile.icon);
+  const isZoomed = zoomLevel >= 125;
+  const minHeight = zoomLevel >= 150 ? 170 : zoomLevel >= 125 ? 150 : 140;
+  const padding = isZoomed ? 18 : 14;
+  const titleFontSize = zoomLevel >= 150 ? 16 : zoomLevel >= 125 ? 15.5 : 15;
+
   const bgColor =
     tile.section === 'helpful'
       ? BG_HELPFUL
@@ -33,26 +37,32 @@ export function TileCard({ tile, isExpanded, onToggle }: TileCardProps) {
       style={{
         borderRadius: 18,
         backgroundColor: bgColor,
-        padding: 14,
+        padding,
         display: 'flex',
         flexDirection: 'column',
-        height: TILE_HEIGHT,
+        minHeight,
+        height: 'auto',
         boxSizing: 'border-box',
         position: 'relative',
         cursor: 'pointer',
         minWidth: 0,
+        overflow: 'hidden',
+        padding,
       }}
     >
       <div
         lang="de"
         style={{
           fontWeight: 600,
-          fontSize: 15,
+          fontSize: titleFontSize,
           color: TEXT_COLOR,
-          flexShrink: 0,
+          flexShrink: 1,
+          minWidth: 0,
+          width: '100%',
           textAlign: 'center',
           lineHeight: 1.3,
           overflowWrap: 'break-word',
+          wordBreak: 'break-word',
           hyphens: 'auto',
           WebkitHyphens: 'auto',
           msHyphens: 'auto',
@@ -71,9 +81,7 @@ export function TileCard({ tile, isExpanded, onToggle }: TileCardProps) {
         }}
       >
         {isExpanded ? (
-          <div style={{ flexShrink: 0 }}>
-            <ChevronUp size={28} strokeWidth={2} />
-          </div>
+          <ChevronUp size={28} strokeWidth={2} color={TEXT_COLOR} />
         ) : (
           <Icon size={36} color={TEXT_COLOR} strokeWidth={1.5} />
         )}
