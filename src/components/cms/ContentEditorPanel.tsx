@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemText, IconButton, Button } from '@mui/material';
+import { useState, useMemo } from 'react';
+import { Box, List, ListItem, ListItemButton, ListItemText, IconButton, Button, TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import { getIconComponent } from '../../utils/iconMap';
@@ -22,14 +23,28 @@ export function ContentEditorPanel({
   onDeleteTile,
 }: ContentEditorPanelProps) {
   const [editingTile, setEditingTile] = useState<Tile | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const sorted = [...tiles].sort((a, b) => {
+  const sorted = useMemo(() => {
+    return [...tiles].sort((a, b) => {
     const sectionOrder = { helpful: 0, offers: 1, wissenswertes: 2 };
     if (sectionOrder[a.section] !== sectionOrder[b.section]) {
       return sectionOrder[a.section] - sectionOrder[b.section];
     }
     return a.sortOrder - b.sortOrder;
   });
+  }, [tiles]);
+
+  const filtered = useMemo(() => {
+    if (!searchQuery.trim()) return sorted;
+    const q = searchQuery.trim().toLowerCase();
+    return sorted.filter(
+      (t) =>
+        (t.title || '').toLowerCase().includes(q) ||
+        (t.expandedTitle || '').toLowerCase().includes(q) ||
+        (t.description || '').toLowerCase().includes(q)
+    );
+  }, [sorted, searchQuery]);
 
   return (
     <Box>
@@ -53,8 +68,22 @@ export function ContentEditorPanel({
           Kachel hinzufügen
         </Button>
       </Box>
+      <TextField
+        size="small"
+        placeholder="Kacheln durchsuchen…"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        sx={{ mb: 1.5, '& .MuiOutlinedInput-root': { bgcolor: 'action.hover' } }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} />
+            </InputAdornment>
+          ),
+        }}
+      />
       <List dense disablePadding sx={{ bgcolor: 'action.hover', borderRadius: 1 }}>
-        {sorted.map((tile) => (
+        {filtered.map((tile) => (
           <ListItem
             key={tile.id}
             disablePadding

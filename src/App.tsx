@@ -10,6 +10,7 @@ import {
 } from '@mui/material';
 import { CmsPanel } from './components/cms/CmsPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
+import { PageStoreProvider } from './contexts/PageStoreContext';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 
 const theme = createTheme({
@@ -35,7 +36,8 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
-        <CssBaseline />
+        <PageStoreProvider>
+          <CssBaseline />
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <AppBar position="static" color="default" elevation={0}>
             <Toolbar>
@@ -77,6 +79,7 @@ export default function App() {
             </Box>
           </Box>
         </Box>
+        </PageStoreProvider>
       </SnackbarProvider>
     </ThemeProvider>
   );
