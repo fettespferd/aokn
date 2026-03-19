@@ -1,3 +1,46 @@
+/* AOK Buenos Aires Text – lokale Schriftart */
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-RegularItalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-SemiBoldItalic.ttf") format("truetype");
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "AOK Buenos Aires Text";
+  src: url("../assets/Schriftart/AOKBuenosAiresText-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,7 +48,7 @@
 }
 
 body {
-  font-family: "Source Sans 3", "Inter", system-ui, sans-serif;
+  font-family: "AOK Buenos Aires Text", "Source Sans 3", "Inter", system-ui, sans-serif;
 }
 
 /* Drop-Zonen für Tile-Drag-and-Drop */

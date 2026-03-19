@@ -21,7 +21,7 @@ const theme = createTheme({
     text: { primary: '#ffffff', secondary: 'rgba(255,255,255,0.7)' },
   },
   typography: {
-    fontFamily: '"Source Sans 3", "Inter", system-ui, sans-serif',
+    fontFamily: '"AOK Buenos Aires Text", "Source Sans 3", "Inter", system-ui, sans-serif',
   },
   components: {
     MuiButton: { styleOverrides: { root: { borderRadius: 8, textTransform: 'none' } } },
