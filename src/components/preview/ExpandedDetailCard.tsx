@@ -11,7 +11,7 @@ interface ExpandedDetailCardProps {
   zoomLevel?: number;
 }
 
-export function ExpandedDetailCard({ tile, onClose, zoomLevel = 100 }: ExpandedDetailCardProps) {
+export function ExpandedDetailCard({ tile, onClose: _onClose, zoomLevel = 100 }: ExpandedDetailCardProps) {
   const isZoomed = zoomLevel >= 125;
   const padding = isZoomed ? 20 : 16;
   const marginBottom = isZoomed ? 24 : 20;

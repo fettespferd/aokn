@@ -28,11 +28,7 @@ for (const tile of getAllTilesFromData(initialPageData)) {
  * Ergänzt fehlende Kacheln aus initialPageData (z.B. Stillen, Wochenbett für Demo 0.–3. Lebensmonat)
  * und aktualisiert lifeStageIds bei bekannten Kacheln (z.B. Erste-Hilfe für ls-0-3).
  */
-function mergeMissingTiles(
-  section: SectionKey,
-  storedTiles: Tile[],
-  allStageIds: string[]
-): Tile[] {
+function mergeMissingTiles(section: SectionKey, storedTiles: Tile[]): Tile[] {
   const storedIds = new Set(storedTiles.map((t) => t.id));
   const initialTiles = initialPageData.sections[section] ?? [];
   const missing: Tile[] = [];
@@ -81,13 +77,9 @@ export function migratePageData(data: PageData): PageData {
   };
 
   const sections = {
-    helpful: mergeMissingTiles('helpful', data.sections.helpful.map(enrichTile), allStageIds),
-    offers: mergeMissingTiles('offers', data.sections.offers.map(enrichTile), allStageIds),
-    wissenswertes: mergeMissingTiles(
-      'wissenswertes',
-      (data.sections.wissenswertes ?? []).map(enrichTile),
-      allStageIds
-    ),
+    helpful: mergeMissingTiles('helpful', data.sections.helpful.map(enrichTile)),
+    offers: mergeMissingTiles('offers', data.sections.offers.map(enrichTile)),
+    wissenswertes: mergeMissingTiles('wissenswertes', (data.sections.wissenswertes ?? []).map(enrichTile)),
   };
 
   return { ...data, sections };

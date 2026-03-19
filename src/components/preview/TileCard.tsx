@@ -47,7 +47,6 @@ export function TileCard({ tile, isExpanded, onToggle, zoomLevel = 100 }: TileCa
         cursor: 'pointer',
         minWidth: 0,
         overflow: 'hidden',
-        padding,
       }}
     >
       <div
