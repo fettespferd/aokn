@@ -94,8 +94,9 @@ export function MobileFrame({
         flexShrink: 0,
         borderRadius: 40,
         overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
-        border: '12px solid #1a1a1a',
+        boxShadow:
+          '0 25px 50px -12px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.12)',
+        border: '12px solid #2d2d2d',
         backgroundColor: BG_COLOR,
         display: 'flex',
         flexDirection: 'column',

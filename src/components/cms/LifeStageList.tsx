@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useLayoutEffect, useRef } from 'react';
 import {
   Box,
   List,
@@ -37,11 +37,36 @@ export function LifeStageList({ lifeStages, onAdd, onUpdate, onDelete }: LifeSta
   const [formFrom, setFormFrom] = useState(0);
   const [formTo, setFormTo] = useState(3);
 
+  const editSnapshotRef = useRef<LifeStage | null>(null);
+
   const sorted = [...lifeStages].sort((a, b) => a.sortOrder - b.sortOrder);
 
-  const handleSaveEdit = () => {
+  const editingLive = useMemo(
+    () => (editing ? lifeStages.find((s) => s.id === editing.id) ?? editing : null),
+    [editing, lifeStages]
+  );
+
+  useLayoutEffect(() => {
     if (!editing) return;
-    onUpdate(editing.id, { label: formLabel, type: formType, from: formFrom, to: formTo });
+    const s = lifeStages.find((x) => x.id === editing.id) ?? editing;
+    editSnapshotRef.current = structuredClone(s);
+    // Nur bei neuem Bearbeitungs-Kontext (Öffnen / andere Zeitraum-ID), nicht bei jedem Store-Update
+  }, [editing?.id]);
+
+  const handleCancelEdit = () => {
+    if (editing && editSnapshotRef.current) {
+      const snap = editSnapshotRef.current;
+      onUpdate(editing.id, {
+        label: snap.label,
+        type: snap.type,
+        from: snap.from,
+        to: snap.to,
+      });
+    }
+    setEditing(null);
+  };
+
+  const handleDoneEdit = () => {
     setEditing(null);
   };
 
@@ -57,10 +82,6 @@ export function LifeStageList({ lifeStages, onAdd, onUpdate, onDelete }: LifeSta
 
   const openEdit = (stage: LifeStage) => {
     setEditing(stage);
-    setFormLabel(stage.label);
-    setFormType(stage.type);
-    setFormFrom(stage.from);
-    setFormTo(stage.to);
   };
 
   return (
@@ -102,53 +123,55 @@ export function LifeStageList({ lifeStages, onAdd, onUpdate, onDelete }: LifeSta
         ))}
       </List>
 
-      <Dialog open={!!editing} onClose={() => setEditing(null)} maxWidth="xs" fullWidth>
+      <Dialog open={!!editing} onClose={handleDoneEdit} maxWidth="xs" fullWidth>
         <DialogTitle>Zeitraum bearbeiten</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-            <TextField
-              label="Bezeichnung"
-              value={formLabel}
-              onChange={(e) => setFormLabel(e.target.value)}
-              fullWidth
-              size="small"
-              placeholder="z.B. 10.-12. Lebensmonat"
-            />
-            <FormControl fullWidth size="small">
-              <InputLabel>Typ</InputLabel>
-              <Select
-                value={formType}
-                label="Typ"
-                onChange={(e) => setFormType(e.target.value as LifeStageType)}
-              >
-                <MenuItem value="months">Lebensmonate</MenuItem>
-                <MenuItem value="years">Lebensjahr</MenuItem>
-              </Select>
-            </FormControl>
-            <Box sx={{ display: 'flex', gap: 2 }}>
+          {editingLive && (
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
               <TextField
-                label="Von"
-                type="number"
-                value={formFrom}
-                onChange={(e) => setFormFrom(Number(e.target.value))}
+                label="Bezeichnung"
+                value={editingLive.label}
+                onChange={(e) => onUpdate(editingLive.id, { label: e.target.value })}
+                fullWidth
                 size="small"
-                inputProps={{ min: 0 }}
+                placeholder="z.B. 10.-12. Lebensmonat"
               />
-              <TextField
-                label="Bis"
-                type="number"
-                value={formTo}
-                onChange={(e) => setFormTo(Number(e.target.value))}
-                size="small"
-                inputProps={{ min: 0 }}
-              />
+              <FormControl fullWidth size="small">
+                <InputLabel>Typ</InputLabel>
+                <Select
+                  value={editingLive.type}
+                  label="Typ"
+                  onChange={(e) => onUpdate(editingLive.id, { type: e.target.value as LifeStageType })}
+                >
+                  <MenuItem value="months">Lebensmonate</MenuItem>
+                  <MenuItem value="years">Lebensjahr</MenuItem>
+                </Select>
+              </FormControl>
+              <Box sx={{ display: 'flex', gap: 2 }}>
+                <TextField
+                  label="Von"
+                  type="number"
+                  value={editingLive.from}
+                  onChange={(e) => onUpdate(editingLive.id, { from: Number(e.target.value) })}
+                  size="small"
+                  inputProps={{ min: 0 }}
+                />
+                <TextField
+                  label="Bis"
+                  type="number"
+                  value={editingLive.to}
+                  onChange={(e) => onUpdate(editingLive.id, { to: Number(e.target.value) })}
+                  size="small"
+                  inputProps={{ min: 0 }}
+                />
+              </Box>
             </Box>
-          </Box>
+          )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditing(null)}>Abbrechen</Button>
-          <Button variant="contained" onClick={handleSaveEdit}>
-            Speichern
+          <Button onClick={handleCancelEdit}>Abbrechen</Button>
+          <Button variant="contained" onClick={handleDoneEdit}>
+            Fertig
           </Button>
         </DialogActions>
       </Dialog>

@@ -35,6 +35,12 @@ export function ContentEditorPanel({
   });
   }, [tiles]);
 
+  /** Immer die aktuelle Kachel aus dem Store, damit die Vorschau bei Live-Edits mitgeht */
+  const editingTileLive = useMemo(
+    () => (editingTile ? tiles.find((t) => t.id === editingTile.id) ?? editingTile : null),
+    [editingTile, tiles]
+  );
+
   const filtered = useMemo(() => {
     if (!searchQuery.trim()) return sorted;
     const q = searchQuery.trim().toLowerCase();
@@ -126,7 +132,7 @@ export function ContentEditorPanel({
         ))}
       </List>
       <TileEditor
-        tile={editingTile}
+        tile={editingTileLive}
         open={!!editingTile}
         onClose={() => setEditingTile(null)}
         onSave={onUpdateTile}

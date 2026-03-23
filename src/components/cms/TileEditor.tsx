@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -26,83 +26,75 @@ interface TileEditorProps {
   lifeStages: LifeStage[];
 }
 
+/** Felder, die der Editor steuert — für Abbrechen-Rücksetzen */
+function patchFromTile(t: Tile): Partial<Tile> {
+  return {
+    title: t.title,
+    icon: t.icon,
+    expandedTitle: t.expandedTitle,
+    description: t.description,
+    buttonEnabled: t.buttonEnabled,
+    buttonText: t.buttonText,
+    buttonActionType: t.buttonActionType,
+    buttonTarget: t.buttonTarget,
+    shareEnabled: t.shareEnabled,
+    initiallyExpanded: t.initiallyExpanded,
+    isVisible: t.isVisible,
+    lifeStageIds: t.lifeStageIds,
+  };
+}
+
 export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEditorProps) {
-  const [title, setTitle] = useState('');
-  const [icon, setIcon] = useState('FileText');
-  const [expandedTitle, setExpandedTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [buttonEnabled, setButtonEnabled] = useState(false);
-  const [buttonText, setButtonText] = useState('');
-  const [buttonActionType, setButtonActionType] = useState<'link' | 'deeplink' | 'none'>('link');
-  const [buttonTarget, setButtonTarget] = useState('');
-  const [shareEnabled, setShareEnabled] = useState(false);
-  const [initiallyExpanded, setInitiallyExpanded] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
-  const [lifeStageIds, setLifeStageIds] = useState<string[]>([]);
+  const snapshotRef = useRef<Tile | null>(null);
 
-  useEffect(() => {
-    if (tile) {
-      setTitle(tile.title);
-      setIcon(tile.icon);
-      setExpandedTitle(tile.expandedTitle ?? '');
-      setDescription(tile.description ?? '');
-      setButtonEnabled(tile.buttonEnabled);
-      setButtonText(tile.buttonText ?? '');
-      setButtonActionType(tile.buttonActionType ?? 'link');
-      setButtonTarget(tile.buttonTarget ?? '');
-      setShareEnabled(tile.shareEnabled ?? false);
-      setInitiallyExpanded(tile.initiallyExpanded ?? false);
-      setIsVisible(tile.isVisible);
-      setLifeStageIds(tile.lifeStageIds ?? []);
+  useLayoutEffect(() => {
+    if (open && tile) {
+      snapshotRef.current = structuredClone(tile);
     }
-  }, [tile]);
+  }, [open, tile?.id]);
 
-  const handleSave = () => {
-    if (!tile) return;
-    onSave(tile.id, {
-      title,
-      icon,
-      expandedTitle: expandedTitle || undefined,
-      description: description || undefined,
-      buttonEnabled,
-      buttonText: buttonText || undefined,
-      buttonActionType,
-      buttonTarget: buttonTarget || undefined,
-      shareEnabled,
-      initiallyExpanded,
-      isVisible,
-      lifeStageIds: lifeStageIds.length > 0 ? lifeStageIds : undefined,
-    });
+  const handleCancel = () => {
+    if (tile && snapshotRef.current) {
+      onSave(tile.id, patchFromTile(snapshotRef.current));
+    }
+    onClose();
+  };
+
+  const handleDone = () => {
     onClose();
   };
 
   if (!tile) return null;
 
+  const update = (updates: Partial<Tile>) => {
+    onSave(tile.id, updates);
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleDone} maxWidth="sm" fullWidth>
       <DialogTitle>Kachel bearbeiten</DialogTitle>
       <DialogContent>
         <Stack spacing={2.5} sx={{ mt: 1 }}>
           <TextField
             label="Titel"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={tile.title}
+            onChange={(e) => update({ title: e.target.value })}
             fullWidth
             size="small"
           />
-          <IconSelect value={icon} onChange={setIcon} />
+          <IconSelect value={tile.icon} onChange={(icon) => update({ icon })} />
           <TextField
             label="Längerer Titel (aufgeklappt)"
-            value={expandedTitle}
-            onChange={(e) => setExpandedTitle(e.target.value)}
+            value={tile.expandedTitle ?? ''}
+            onChange={(e) => update({ expandedTitle: e.target.value || undefined })}
             fullWidth
             size="small"
             placeholder="z.B. Warum ist ein Rückbildungskurs sinnvoll?"
           />
           <TextField
             label="Beschreibung"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={tile.description ?? ''}
+            onChange={(e) => update({ description: e.target.value || undefined })}
             fullWidth
             size="small"
             multiline
@@ -110,24 +102,31 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
           />
           <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 2 }}>
             <FormControlLabel
-              control={<Switch checked={buttonEnabled} onChange={(e) => setButtonEnabled(e.target.checked)} />}
+              control={
+                <Switch
+                  checked={tile.buttonEnabled}
+                  onChange={(e) => update({ buttonEnabled: e.target.checked })}
+                />
+              }
               label="Button anzeigen"
             />
-            {buttonEnabled && (
+            {tile.buttonEnabled && (
               <Stack spacing={2} sx={{ mt: 2 }}>
                 <TextField
                   label="Button-Text"
-                  value={buttonText}
-                  onChange={(e) => setButtonText(e.target.value)}
+                  value={tile.buttonText ?? ''}
+                  onChange={(e) => update({ buttonText: e.target.value || undefined })}
                   fullWidth
                   size="small"
                 />
                 <FormControl fullWidth size="small">
                   <InputLabel>Button-Aktion</InputLabel>
                   <Select
-                    value={buttonActionType}
+                    value={tile.buttonActionType ?? 'link'}
                     label="Button-Aktion"
-                    onChange={(e) => setButtonActionType(e.target.value as 'link' | 'deeplink' | 'none')}
+                    onChange={(e) =>
+                      update({ buttonActionType: e.target.value as 'link' | 'deeplink' | 'none' })
+                    }
                   >
                     <MenuItem value="link">Link</MenuItem>
                     <MenuItem value="deeplink">Deeplink</MenuItem>
@@ -136,8 +135,8 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
                 </FormControl>
                 <TextField
                   label="Button-Ziel (URL oder Deeplink)"
-                  value={buttonTarget}
-                  onChange={(e) => setButtonTarget(e.target.value)}
+                  value={tile.buttonTarget ?? ''}
+                  onChange={(e) => update({ buttonTarget: e.target.value || undefined })}
                   fullWidth
                   size="small"
                 />
@@ -146,16 +145,28 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
           </Box>
           <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 2 }}>
             <FormControlLabel
-              control={<Switch checked={shareEnabled} onChange={(e) => setShareEnabled(e.target.checked)} />}
+              control={
+                <Switch
+                  checked={tile.shareEnabled ?? false}
+                  onChange={(e) => update({ shareEnabled: e.target.checked })}
+                />
+              }
               label="Share-Icon anzeigen"
             />
             <FormControlLabel
-              control={<Switch checked={initiallyExpanded} onChange={(e) => setInitiallyExpanded(e.target.checked)} />}
+              control={
+                <Switch
+                  checked={tile.initiallyExpanded ?? false}
+                  onChange={(e) => update({ initiallyExpanded: e.target.checked })}
+                />
+              }
               label="Initial aufgeklappt"
               sx={{ display: 'block', mt: 1 }}
             />
             <FormControlLabel
-              control={<Switch checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} />}
+              control={
+                <Switch checked={tile.isVisible} onChange={(e) => update({ isVisible: e.target.checked })} />
+              }
               label="Sichtbar in Vorschau"
               sx={{ display: 'block', mt: 1 }}
             />
@@ -166,9 +177,12 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
                 <InputLabel>Lebensbereiche (leer = alle)</InputLabel>
                 <Select
                   multiple
-                  value={lifeStageIds}
+                  value={tile.lifeStageIds ?? []}
                   label="Lebensbereiche (leer = alle)"
-                  onChange={(e) => setLifeStageIds(e.target.value as string[])}
+                  onChange={(e) => {
+                    const next = e.target.value as string[];
+                    update({ lifeStageIds: next.length > 0 ? next : undefined });
+                  }}
                   renderValue={(selected) =>
                     selected.length === 0 ? 'Alle Lebensbereiche' : selected.length + ' ausgewählt'
                   }
@@ -188,9 +202,9 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
         </Stack>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Abbrechen</Button>
-        <Button variant="contained" onClick={handleSave}>
-          Speichern
+        <Button onClick={handleCancel}>Abbrechen</Button>
+        <Button variant="contained" onClick={handleDone}>
+          Fertig
         </Button>
       </DialogActions>
     </Dialog>
