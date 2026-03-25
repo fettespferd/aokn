@@ -6,9 +6,32 @@ import {
   TextField,
   Typography,
   Alert,
+  ThemeProvider,
+  createTheme,
 } from '@mui/material';
 
 const AUTH_STORAGE_KEY = 'aokn-cms-auth';
+
+/** Eigenes Theme nur für die Login-Seite: neutral/kühl, ohne AOK-Grün */
+const loginTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: { main: '#6b93d6' },
+    secondary: { main: '#5c6570' },
+    background: { default: '#0c0e12', paper: '#161a22' },
+    text: { primary: '#e8eaed', secondary: 'rgba(232, 234, 237, 0.68)' },
+    divider: 'rgba(255, 255, 255, 0.09)',
+    info: { main: '#7eb6ff' },
+    error: { main: '#f87171' },
+  },
+  typography: {
+    fontFamily: '"Source Sans 3", "Inter", system-ui, sans-serif',
+  },
+  components: {
+    MuiButton: { styleOverrides: { root: { borderRadius: 8, textTransform: 'none' } } },
+    MuiPaper: { styleOverrides: { root: { borderRadius: 12 } } },
+  },
+});
 
 const CMS_USERNAME = 'AOKN';
 const CMS_PASSWORD = 'CMSIstSuper2026!';
@@ -60,6 +83,7 @@ export function CmsLoginGate({ children }: CmsLoginGateProps) {
   }
 
   return (
+    <ThemeProvider theme={loginTheme}>
     <Box
       sx={{
         minHeight: '100vh',
@@ -90,7 +114,16 @@ export function CmsLoginGate({ children }: CmsLoginGateProps) {
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Bitte Zugangsdaten eingeben.
         </Typography>
-        <Alert severity="info" sx={{ mb: 2.5 }}>
+        <Alert
+          severity="info"
+          sx={{
+            mb: 2.5,
+            bgcolor: 'rgba(96, 165, 250, 0.1)',
+            border: '1px solid rgba(96, 165, 250, 0.28)',
+            color: 'text.secondary',
+            '& .MuiAlert-icon': { color: 'info.main' },
+          }}
+        >
           <Typography variant="subtitle2" component="p" fontWeight={700} sx={{ mb: 0.5 }}>
             Nur auf diesem Gerät gespeichert
           </Typography>
@@ -134,5 +167,6 @@ export function CmsLoginGate({ children }: CmsLoginGateProps) {
         </Box>
       </Paper>
     </Box>
+    </ThemeProvider>
   );
 }
