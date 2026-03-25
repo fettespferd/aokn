@@ -45,7 +45,7 @@ export default function App() {
           <AppBar position="static" color="default" elevation={0}>
             <Toolbar sx={{ gap: 2 }}>
               <Typography variant="h6" component="span" fontWeight={600} sx={{ flex: 1 }}>
-                Schwangerschafts-App CMS
+                Kindergesundheit-APP CMS
               </Typography>
               <Button
                 color="inherit"

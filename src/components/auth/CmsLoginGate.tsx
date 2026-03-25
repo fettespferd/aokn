@@ -82,7 +82,10 @@ export function CmsLoginGate({ children }: CmsLoginGateProps) {
         }}
       >
         <Typography variant="h6" component="h1" fontWeight={600} gutterBottom>
-          Anmeldung CMS
+          Kindergesundheit-APP CMS
+        </Typography>
+        <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+          Anmeldung
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           Bitte Zugangsdaten eingeben.
