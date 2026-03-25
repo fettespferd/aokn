@@ -3,6 +3,7 @@ import type { PageData, Tile, SectionKey, LifeStage } from '../types/page';
 import { initialPageData } from '../data/initialData';
 import { loadFromStorage, saveToStorage } from '../utils/jsonStorage';
 import { migratePageData } from '../utils/migratePageData';
+import { getTilesForAssignment } from '../utils/previewTiles';
 
 function generateId(): string {
   return `tile-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -224,20 +225,28 @@ export function PageStoreProvider({ children }: { children: ReactNode }) {
   );
 
   const addTileToSectionForLifeStage = useCallback(
-    (tileId: string, lifeStageId: string, section: SectionKey, sortOrder: number) => {
+    (tileId: string, lifeStageId: string, section: SectionKey, targetIndex: number) => {
       setPageDataState((prev) => {
+        const bySection = getTilesForAssignment(prev, lifeStageId);
+        const idsInSection = bySection[section].map((t) => t.id).filter((id) => id !== tileId);
+        const insertAt = Math.max(0, Math.min(targetIndex, idsInSection.length));
+        const orderedIds = [...idsInSection.slice(0, insertAt), tileId, ...idsInSection.slice(insertAt)];
+
         const updateInSection = (tiles: Tile[]) =>
           tiles.map((t) => {
-            if (t.id !== tileId) return t;
+            const idx = orderedIds.indexOf(t.id);
+            if (idx < 0) return t;
+            const nextByOrder = { ...(t.sortOrderByLifeStage ?? {}), [lifeStageId]: idx };
+            if (t.id !== tileId) {
+              return { ...t, sortOrderByLifeStage: nextByOrder };
+            }
             const ids = t.lifeStageIds ?? [];
             const hasStage = ids.includes(lifeStageId);
             const nextIds = hasStage ? ids : [...ids, lifeStageId];
-            const nextBySection = { ...(t.sectionByLifeStage ?? {}), [lifeStageId]: section };
-            const nextByOrder = { ...(t.sortOrderByLifeStage ?? {}), [lifeStageId]: sortOrder };
             return {
               ...t,
               lifeStageIds: nextIds,
-              sectionByLifeStage: nextBySection,
+              sectionByLifeStage: { ...(t.sectionByLifeStage ?? {}), [lifeStageId]: section },
               sortOrderByLifeStage: nextByOrder,
             };
           });
