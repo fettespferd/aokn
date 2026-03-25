@@ -1,6 +1,10 @@
+import type { TileColorPresetId } from '../constants/tileColorPresets';
+
 export type SectionKey = 'helpful' | 'offers' | 'wissenswertes';
 
 export type LifeStageType = 'months' | 'years';
+
+export type { TileColorPresetId };
 
 export interface LifeStage {
   id: string;
@@ -26,6 +30,8 @@ export interface Tile {
   initiallyExpanded?: boolean;
   isVisible: boolean;
   sortOrder: number;
+  /** Hintergrundfarbe in der Vorschau; ohne Eintrag = Standard (AOK-Grün). */
+  tileColorPreset?: TileColorPresetId;
   /** Leer = für alle Lebensbereiche sichtbar. Sonst nur wenn selectedLifeStageId in der Liste. */
   lifeStageIds?: string[];
   /** Optionale Sektion pro Lebensphase – sonst wird section verwendet. */

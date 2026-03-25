@@ -7,9 +7,11 @@ import {
   Toolbar,
   Typography,
   useMediaQuery,
+  Button,
 } from '@mui/material';
 import { CmsPanel } from './components/cms/CmsPanel';
 import { PreviewPanel } from './components/preview/PreviewPanel';
+import { CmsLoginGate, setCmsSessionActive } from './components/auth/CmsLoginGate';
 import { PageStoreProvider } from './contexts/PageStoreContext';
 import { SnackbarProvider } from './contexts/SnackbarContext';
 
@@ -36,14 +38,25 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
+        <CmsLoginGate>
         <PageStoreProvider>
           <CssBaseline />
         <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
           <AppBar position="static" color="default" elevation={0}>
-            <Toolbar>
-              <Typography variant="h6" component="span" fontWeight={600}>
+            <Toolbar sx={{ gap: 2 }}>
+              <Typography variant="h6" component="span" fontWeight={600} sx={{ flex: 1 }}>
                 Schwangerschafts-App CMS
               </Typography>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => {
+                  setCmsSessionActive(false);
+                  window.location.reload();
+                }}
+              >
+                Abmelden
+              </Button>
             </Toolbar>
           </AppBar>
 
@@ -80,6 +93,7 @@ export default function App() {
           </Box>
         </Box>
         </PageStoreProvider>
+        </CmsLoginGate>
       </SnackbarProvider>
     </ThemeProvider>
   );

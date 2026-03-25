@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { Box, TextField, Button } from '@mui/material';
 import { ContentEditorPanel } from './ContentEditorPanel';
 import { AssignmentBoard } from './AssignmentBoard';
@@ -11,13 +11,12 @@ import { initialPageData } from '../../data/initialData';
 export function CmsPanel() {
   const {
     pageData,
+    selectedLifeStageId,
     setSelectedLifeStageId,
     updatePageTitle,
     addTile,
     updateTile,
     deleteTile,
-    reorderTiles,
-    moveTileToSection,
     updateTileAssignmentForLifeStage,
     addTileToSectionForLifeStage,
     reorderTilesForLifeStage,
@@ -27,19 +26,6 @@ export function CmsPanel() {
     setPageData,
   } = usePageStore();
   const [importOpen, setImportOpen] = useState(false);
-  const [assignmentLifeStageId, setAssignmentLifeStageId] = useState<string | null>(null);
-
-  const firstLifeStageId =
-    [...(pageData.lifeStages ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)[0]?.id ?? null;
-
-  const handleAssignmentLifeStageChange = useCallback(
-    (id: string | null) => {
-      setAssignmentLifeStageId(id);
-      const previewStageId = id ?? firstLifeStageId;
-      setSelectedLifeStageId(previewStageId);
-    },
-    [setSelectedLifeStageId, firstLifeStageId]
-  );
 
   const allTiles = [
     ...pageData.sections.helpful,
@@ -94,13 +80,12 @@ export function CmsPanel() {
         <Box sx={{ borderTop: 1, borderColor: 'divider', pt: 2 }}>
           <AssignmentBoard
             pageData={pageData}
-            assignmentLifeStageId={assignmentLifeStageId}
-            onAssignmentLifeStageChange={handleAssignmentLifeStageChange}
-            onMoveTile={moveTileToSection}
-            onReorderInSection={reorderTiles}
+            assignmentLifeStageId={selectedLifeStageId}
+            onAssignmentLifeStageChange={setSelectedLifeStageId}
             onReorderForLifeStage={reorderTilesForLifeStage}
             onUpdateAssignmentForLifeStage={updateTileAssignmentForLifeStage}
             onAddTileToSectionForLifeStage={addTileToSectionForLifeStage}
+            onDeleteTile={deleteTile}
           />
         </Box>
 

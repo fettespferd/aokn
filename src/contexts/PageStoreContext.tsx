@@ -15,6 +15,7 @@ function generateLifeStageId(): string {
 export interface PageStoreValue {
   pageData: PageData;
   expandedTileId: string | null;
+  /** Gewählte Lebensphase für Vorschau/Zuordnung; null nur wenn es keine Zeiträume gibt */
   selectedLifeStageId: string | null;
   setExpandedTileId: (id: string | null) => void;
   setSelectedLifeStageId: (id: string | null) => void;
@@ -70,10 +71,20 @@ export function PageStoreProvider({ children }: { children: ReactNode }) {
     return allTiles.find((t) => t.initiallyExpanded)?.id ?? null;
   });
 
+  /** Immer eine konkrete Lebensphase (Vorschau + Zuordnung); null nur wenn keine Zeiträume existieren */
   const [selectedLifeStageId, setSelectedLifeStageId] = useState<string | null>(() => {
-    const stages = pageData.lifeStages ?? [];
-    return stages.length > 0 ? stages[0].id : null;
+    const stages = [...(pageData.lifeStages ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+    return stages[0]?.id ?? null;
   });
+
+  useEffect(() => {
+    const sorted = [...(pageData.lifeStages ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+    if (sorted.length === 0) {
+      setSelectedLifeStageId(null);
+      return;
+    }
+    setSelectedLifeStageId((cur) => (cur && sorted.some((s) => s.id === cur) ? cur : sorted[0].id));
+  }, [pageData.lifeStages]);
 
   useEffect(() => {
     saveToStorage(pageData);
@@ -275,10 +286,12 @@ export function PageStoreProvider({ children }: { children: ReactNode }) {
     ];
     const initiallyExpanded = allTiles.find((t) => t.initiallyExpanded);
     setExpandedTileId(initiallyExpanded?.id ?? null);
-    const stages = data.lifeStages ?? [];
-    setSelectedLifeStageId((current) =>
-      stages.some((s) => s.id === current) ? current : (stages[0]?.id ?? null)
-    );
+    const sorted = [...(data.lifeStages ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+    setSelectedLifeStageId((current) => {
+      if (sorted.length === 0) return null;
+      if (current && sorted.some((s) => s.id === current)) return current;
+      return sorted[0].id;
+    });
   }, []);
 
   const addLifeStage = useCallback((stage: Omit<LifeStage, 'id'>): LifeStage => {
@@ -302,7 +315,6 @@ export function PageStoreProvider({ children }: { children: ReactNode }) {
       ...prev,
       lifeStages: (prev.lifeStages ?? []).filter((s) => s.id !== id),
     }));
-    setSelectedLifeStageId((current) => (current === id ? null : current));
   }, []);
 
   const reorderLifeStages = useCallback((draggedId: string, targetId: string | 'end') => {

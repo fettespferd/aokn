@@ -14,8 +14,8 @@ interface LifeStageSelectorProps {
 export function LifeStageSelector({ lifeStages, selectedId, onSelect }: LifeStageSelectorProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const sorted = [...lifeStages].sort((a, b) => a.sortOrder - b.sortOrder);
-  const currentIndex = sorted.findIndex((s) => s.id === selectedId);
-  const current = selectedId ? sorted.find((s) => s.id === selectedId) : null;
+  const current = sorted.find((s) => s.id === selectedId) ?? sorted[0];
+  const currentIndex = current ? sorted.findIndex((s) => s.id === current.id) : -1;
 
   const handlePrev = () => {
     if (currentIndex > 0) onSelect(sorted[currentIndex - 1].id);
@@ -73,7 +73,7 @@ export function LifeStageSelector({ lifeStages, selectedId, onSelect }: LifeStag
             fontSize: 15,
           }}
         >
-          <span>{current?.label ?? 'Zeitraum wählen'}</span>
+          <span>{current?.label ?? ''}</span>
           <ChevronDown
             size={20}
             color={TEXT_DARK}
@@ -138,9 +138,9 @@ export function LifeStageSelector({ lifeStages, selectedId, onSelect }: LifeStag
                   width: '100%',
                   padding: '14px 16px',
                   border: 'none',
-                  background: stage.id === selectedId ? 'rgba(140,198,63,0.2)' : 'transparent',
+                  background: stage.id === (selectedId ?? sorted[0]?.id) ? 'rgba(140,198,63,0.2)' : 'transparent',
                   color: TEXT_DARK,
-                  fontWeight: stage.id === selectedId ? 700 : 500,
+                  fontWeight: stage.id === (selectedId ?? sorted[0]?.id) ? 700 : 500,
                   fontSize: 15,
                   textAlign: 'center',
                   cursor: 'pointer',

@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
-import { Box, FormControl, InputLabel, Select, MenuItem, Typography } from '@mui/material';
+import { useState, useCallback, useSyncExternalStore } from 'react';
+import { Box, FormControl, InputLabel, Select, MenuItem, Typography, IconButton } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { getIconComponent } from '../../utils/iconMap';
 import { getTilesForAssignment } from '../../utils/previewTiles';
 import type { Tile, SectionKey } from '../../types/page';
@@ -10,12 +11,27 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   wissenswertes: 'Wissenswertes',
 };
 
+const SECTION_STACK_Z: Record<SectionKey, number> = {
+  helpful: 1,
+  offers: 2,
+  wissenswertes: 3,
+};
+
+/** Drop-Zeilen nur bei aktivem Drag – sonst pointer-events: none (verhindert, dass unsichtbare Streifen Klicks abfangen). */
+function subscribeBodyDragClass(onStoreChange: () => void) {
+  const obs = new MutationObserver(onStoreChange);
+  obs.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  return () => obs.disconnect();
+}
+
+function getBodyDragActiveSnapshot(): boolean {
+  return typeof document !== 'undefined' && document.body.classList.contains('tile-drag-active');
+}
+
 interface AssignmentBoardProps {
   pageData: import('../../types/page').PageData;
   assignmentLifeStageId: string | null;
-  onAssignmentLifeStageChange: (id: string | null) => void;
-  onMoveTile: (tileId: string, targetSection: SectionKey, targetIndex: number) => void;
-  onReorderInSection: (section: SectionKey, draggedId: string, targetId: string | 'end') => void;
+  onAssignmentLifeStageChange: (id: string) => void;
   onReorderForLifeStage: (section: SectionKey, lifeStageId: string, orderedTileIds: string[]) => void;
   onUpdateAssignmentForLifeStage: (
     tileId: string,
@@ -28,24 +44,28 @@ interface AssignmentBoardProps {
     section: SectionKey,
     sortOrder: number
   ) => void;
+  /** Kachel vollständig aus dem Projekt entfernen (wie in „Inhalte bearbeiten“) */
+  onDeleteTile: (tileId: string) => void;
 }
 
 export function AssignmentBoard({
   pageData,
   assignmentLifeStageId,
   onAssignmentLifeStageChange,
-  onMoveTile,
-  onReorderInSection,
   onReorderForLifeStage,
   onUpdateAssignmentForLifeStage,
   onAddTileToSectionForLifeStage,
+  onDeleteTile,
 }: AssignmentBoardProps) {
   const [dragOver, setDragOver] = useState<{ section: SectionKey; index: number } | null>(null);
   const [draggedTile, setDraggedTile] = useState<{ tile: Tile; section: SectionKey } | null>(null);
+  const dragActiveOnBody = useSyncExternalStore(subscribeBodyDragClass, getBodyDragActiveSnapshot, () => false);
 
-  const tilesBySection = getTilesForAssignment(pageData, assignmentLifeStageId);
   const lifeStages = pageData.lifeStages ?? [];
   const sortedStages = [...lifeStages].sort((a, b) => a.sortOrder - b.sortOrder);
+  const activeStageId = assignmentLifeStageId ?? sortedStages[0]?.id ?? null;
+
+  const tilesBySection = getTilesForAssignment(pageData, activeStageId);
 
   const handleDragStart = useCallback((e: React.DragEvent, tile: Tile, section: SectionKey) => {
     setDraggedTile({ tile, section });
@@ -80,46 +100,28 @@ export function AssignmentBoard({
       e.preventDefault();
       const tileId = e.dataTransfer.getData('text/plain');
       const dragSource = e.dataTransfer.getData('application/x-drag-source');
-      if (!tileId) return;
+      if (!tileId || !activeStageId) return;
 
       const fromPool = dragSource === 'content-pool';
 
       if (fromPool) {
-        if (assignmentLifeStageId) {
-          onAddTileToSectionForLifeStage(tileId, assignmentLifeStageId, targetSection, targetIndex);
-        } else {
-          onMoveTile(tileId, targetSection, targetIndex);
-        }
+        onAddTileToSectionForLifeStage(tileId, activeStageId, targetSection, targetIndex);
       } else if (draggedTile) {
         const sourceSection = draggedTile.section;
 
-        if (assignmentLifeStageId) {
-          if (sourceSection === targetSection) {
-            const tiles = tilesBySection[targetSection];
-            const fromIdx = tiles.findIndex((t) => t.id === tileId);
-            if (fromIdx < 0) return;
-            const reordered = [...tiles];
-            const [removed] = reordered.splice(fromIdx, 1);
-            reordered.splice(targetIndex, 0, removed);
-            onReorderForLifeStage(targetSection, assignmentLifeStageId, reordered.map((t) => t.id));
-          } else {
-            onUpdateAssignmentForLifeStage(tileId, assignmentLifeStageId, {
-              section: targetSection,
-              sortOrder: targetIndex,
-            });
-          }
+        if (sourceSection === targetSection) {
+          const tiles = tilesBySection[targetSection];
+          const fromIdx = tiles.findIndex((t) => t.id === tileId);
+          if (fromIdx < 0) return;
+          const reordered = [...tiles];
+          const [removed] = reordered.splice(fromIdx, 1);
+          reordered.splice(targetIndex, 0, removed);
+          onReorderForLifeStage(targetSection, activeStageId, reordered.map((t) => t.id));
         } else {
-          if (sourceSection === targetSection) {
-            const tiles = tilesBySection[targetSection];
-            const targetTile = tiles[targetIndex];
-            onReorderInSection(
-              targetSection,
-              tileId,
-              targetTile ? targetTile.id : 'end'
-            );
-          } else {
-            onMoveTile(tileId, targetSection, targetIndex);
-          }
+          onUpdateAssignmentForLifeStage(tileId, activeStageId, {
+            section: targetSection,
+            sortOrder: targetIndex,
+          });
         }
       }
 
@@ -127,10 +129,8 @@ export function AssignmentBoard({
     },
     [
       draggedTile,
-      assignmentLifeStageId,
+      activeStageId,
       tilesBySection,
-      onMoveTile,
-      onReorderInSection,
       onReorderForLifeStage,
       onUpdateAssignmentForLifeStage,
       onAddTileToSectionForLifeStage,
@@ -138,20 +138,26 @@ export function AssignmentBoard({
     ]
   );
 
+  if (sortedStages.length === 0) {
+    return (
+      <Box>
+        <Typography variant="body2" color="text.secondary">
+          Legen Sie unter „Lebensphasen“ mindestens einen Zeitraum an, um Kacheln zuzuordnen.
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Box sx={{ mb: 1.5 }}>
         <FormControl fullWidth size="small">
           <InputLabel>Zuordnung für Zeitraum</InputLabel>
           <Select
-            value={assignmentLifeStageId ?? '__standard__'}
+            value={activeStageId ?? ''}
             label="Zuordnung für Zeitraum"
-            onChange={(e) => {
-              const v = e.target.value;
-              onAssignmentLifeStageChange(v === '__standard__' ? null : v);
-            }}
+            onChange={(e) => onAssignmentLifeStageChange(e.target.value)}
           >
-            <MenuItem value="__standard__">Standard (alle)</MenuItem>
             {sortedStages.map((s) => (
               <MenuItem key={s.id} value={s.id}>
                 {s.label}
@@ -160,7 +166,8 @@ export function AssignmentBoard({
           </Select>
         </FormControl>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-          Ziehe Kacheln zwischen den Bereichen oder zum Sortieren
+          Ziehe Kacheln zwischen den Bereichen oder zum Sortieren. Mit dem Papierkorb-Symbol entfernst du die
+          Kachel vollständig.
         </Typography>
       </Box>
 
@@ -169,6 +176,8 @@ export function AssignmentBoard({
           <Box
             key={sectionKey}
             sx={{
+              position: 'relative',
+              zIndex: SECTION_STACK_Z[sectionKey],
               border: 1,
               borderColor: 'divider',
               borderRadius: 1.5,
@@ -191,35 +200,72 @@ export function AssignmentBoard({
                       bgcolor: dragOver?.section === sectionKey && dragOver?.index === idx ? 'primary.main' : 'transparent',
                       opacity: dragOver?.section === sectionKey && dragOver?.index === idx ? 0.35 : 0,
                       transition: 'opacity 0.15s',
+                      // Unsichtbare Streifen würden sonst trotz opacity: 0 Klicks abfangen; bei Drag wieder aktiv
+                      pointerEvents:
+                        dragActiveOnBody || (dragOver?.section === sectionKey && dragOver?.index === idx)
+                          ? 'auto'
+                          : 'none',
                     }}
                     onDragOver={(e) => handleDragOver(e, sectionKey, idx)}
                     onDragLeave={handleDragLeave}
                     onDrop={(e) => handleDrop(e, sectionKey, idx)}
                   />
                   <Box
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, tile, sectionKey)}
-                    onDragEnd={handleDragEnd}
                     sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      py: 1,
-                      px: 1.5,
+                      position: 'relative',
                       borderRadius: 1,
                       bgcolor: draggedTile?.tile.id === tile.id ? 'action.selected' : 'background.paper',
-                      cursor: 'grab',
                       opacity: draggedTile?.tile.id === tile.id ? 0.6 : 1,
-                      '&:active': { cursor: 'grabbing' },
+                      pr: 5,
+                      minHeight: 44,
                     }}
                   >
-                    {(() => {
-                      const Icon = getIconComponent(tile.icon);
-                      return <Icon size={18} strokeWidth={2} />;
-                    })()}
-                    <Typography variant="body2" fontWeight={500} noWrap sx={{ flex: 1 }}>
-                      {tile.title || 'Ohne Titel'}
-                    </Typography>
+                    <Box
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, tile, sectionKey)}
+                      onDragEnd={handleDragEnd}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        py: 1,
+                        pl: 1.5,
+                        pr: 0,
+                        cursor: 'grab',
+                        '&:active': { cursor: 'grabbing' },
+                      }}
+                    >
+                      {(() => {
+                        const Icon = getIconComponent(tile.icon);
+                        return <Icon size={18} strokeWidth={2} />;
+                      })()}
+                      <Typography variant="body2" fontWeight={500} noWrap sx={{ flex: 1, minWidth: 0 }}>
+                        {tile.title || 'Ohne Titel'}
+                      </Typography>
+                    </Box>
+                    <IconButton
+                      type="button"
+                      size="small"
+                      aria-label="Kachel löschen"
+                      draggable={false}
+                      disableRipple
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteTile(tile.id);
+                      }}
+                      sx={{
+                        position: 'absolute',
+                        right: 2,
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        zIndex: 10,
+                        color: 'text.secondary',
+                        pointerEvents: 'auto',
+                        '&:hover': { color: 'error.main', bgcolor: 'action.hover' },
+                      }}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
                   </Box>
                 </Box>
               ))}
@@ -237,6 +283,7 @@ export function AssignmentBoard({
                     dragOver?.section === sectionKey && dragOver?.index === tilesBySection[sectionKey].length
                       ? 'action.selected'
                       : 'transparent',
+                  pointerEvents: dragActiveOnBody ? 'auto' : 'none',
                 }}
                 onDragOver={(e) => handleDragOver(e, sectionKey, tilesBySection[sectionKey].length)}
                 onDragLeave={handleDragLeave}

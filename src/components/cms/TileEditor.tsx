@@ -16,6 +16,11 @@ import {
   Box,
 } from '@mui/material';
 import { IconSelect } from './IconSelect';
+import {
+  DEFAULT_TILE_COLOR_PRESET_ID,
+  TILE_COLOR_PRESETS,
+  type TileColorPresetId,
+} from '../../constants/tileColorPresets';
 import type { Tile, LifeStage } from '../../types/page';
 
 interface TileEditorProps {
@@ -31,6 +36,7 @@ function patchFromTile(t: Tile): Partial<Tile> {
   return {
     title: t.title,
     icon: t.icon,
+    tileColorPreset: t.tileColorPreset,
     expandedTitle: t.expandedTitle,
     description: t.description,
     buttonEnabled: t.buttonEnabled,
@@ -83,6 +89,60 @@ export function TileEditor({ tile, open, onClose, onSave, lifeStages }: TileEdit
             size="small"
           />
           <IconSelect value={tile.icon} onChange={(icon) => update({ icon })} />
+          <FormControl fullWidth size="small">
+            <InputLabel>Kachelfarbe (Vorschau)</InputLabel>
+            <Select
+              value={tile.tileColorPreset ?? DEFAULT_TILE_COLOR_PRESET_ID}
+              label="Kachelfarbe (Vorschau)"
+              onChange={(e) => {
+                const v = e.target.value as TileColorPresetId;
+                update({
+                  tileColorPreset: v === DEFAULT_TILE_COLOR_PRESET_ID ? undefined : v,
+                });
+              }}
+              renderValue={(selected) => {
+                const preset = TILE_COLOR_PRESETS.find((p) => p.id === selected);
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                    <Box
+                      sx={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: 1,
+                        bgcolor: preset?.color ?? '#3d4d3e',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        flexShrink: 0,
+                      }}
+                    />
+                    {preset?.label ?? selected}
+                  </Box>
+                );
+              }}
+            >
+              {TILE_COLOR_PRESETS.map((p) => (
+                <MenuItem key={p.id} value={p.id}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                    <Box
+                      sx={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: 1,
+                        bgcolor: p.color,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        flexShrink: 0,
+                      }}
+                    />
+                    {p.label}
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Box component="p" sx={{ m: 0, fontSize: 12, color: 'text.secondary' }}>
+            Ohne Auswahl gilt einheitlich das AOK-Grün; andere Töne nur bei Bedarf pro Kachel.
+          </Box>
           <TextField
             label="Längerer Titel (aufgeklappt)"
             value={tile.expandedTitle ?? ''}

@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Chip,
+  Stack,
+  Typography,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { MobileFrame } from './MobileFrame';
 import { usePageStore } from '../../hooks/usePageStore';
 import { DEVICE_PRESETS, type DevicePreset } from './devicePresets';
@@ -22,41 +31,70 @@ export function PreviewPanel() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-      <Box>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600 }}>
-          Gerätegröße
-        </Typography>
-        <Stack direction="row" flexWrap="wrap" gap={1} useFlexGap>
-          {DEVICE_PRESETS.map((d) => (
-            <Chip
-              key={d.id}
-              label={`${d.label} (${d.width}×${d.height})`}
-              onClick={() => setDevice(d)}
-              color={device.id === d.id ? 'primary' : 'default'}
-              variant={device.id === d.id ? 'filled' : 'outlined'}
-              size="small"
-            />
-          ))}
-        </Stack>
-      </Box>
+      <Accordion
+        defaultExpanded={false}
+        disableGutters
+        elevation={0}
+        sx={{
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: 1,
+          bgcolor: 'background.paper',
+          '&:before': { display: 'none' },
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon sx={{ color: 'text.secondary' }} />}
+          sx={{
+            minHeight: 48,
+            '& .MuiAccordionSummary-content': { my: 1, flexDirection: 'column', alignItems: 'flex-start', gap: 0.25 },
+          }}
+        >
+          <Typography variant="subtitle2" fontWeight={600}>
+            Vorschau-Einstellungen
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Gerätegröße und Zoom (Barrierefreiheit)
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ pt: 0, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600 }}>
+              Gerätegröße
+            </Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1} useFlexGap>
+              {DEVICE_PRESETS.map((d) => (
+                <Chip
+                  key={d.id}
+                  label={`${d.label} (${d.width}×${d.height})`}
+                  onClick={() => setDevice(d)}
+                  color={device.id === d.id ? 'primary' : 'default'}
+                  variant={device.id === d.id ? 'filled' : 'outlined'}
+                  size="small"
+                />
+              ))}
+            </Stack>
+          </Box>
 
-      <Box>
-        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600 }}>
-          Zoom (Barrierefreiheit)
-        </Typography>
-        <Stack direction="row" flexWrap="wrap" gap={1} useFlexGap>
-          {ZOOM_LEVELS.map((z) => (
-            <Chip
-              key={z}
-              label={`${z}%`}
-              onClick={() => setZoomLevel(z)}
-              color={zoomLevel === z ? 'primary' : 'default'}
-              variant={zoomLevel === z ? 'filled' : 'outlined'}
-              size="small"
-            />
-          ))}
-        </Stack>
-      </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600 }}>
+              Zoom (Barrierefreiheit)
+            </Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1} useFlexGap>
+              {ZOOM_LEVELS.map((z) => (
+                <Chip
+                  key={z}
+                  label={`${z}%`}
+                  onClick={() => setZoomLevel(z)}
+                  color={zoomLevel === z ? 'primary' : 'default'}
+                  variant={zoomLevel === z ? 'filled' : 'outlined'}
+                  size="small"
+                />
+              ))}
+            </Stack>
+          </Box>
+        </AccordionDetails>
+      </Accordion>
 
       <Box
         sx={{

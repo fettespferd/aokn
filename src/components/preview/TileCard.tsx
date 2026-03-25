@@ -1,10 +1,8 @@
 import { ChevronUp } from 'lucide-react';
 import { getIconComponent } from '../../utils/iconMap';
+import { resolveTileBackgroundColor } from '../../utils/tileColors';
 import type { Tile } from '../../types/page';
 
-const BG_HELPFUL = '#3d4d3e';
-const BG_OFFERS = '#333e3e';
-const BG_WISSENSWERTES = '#2d3d4e';
 const TEXT_COLOR = '#ffffff';
 
 interface TileCardProps {
@@ -21,12 +19,7 @@ export function TileCard({ tile, isExpanded, onToggle, zoomLevel = 100 }: TileCa
   const padding = isZoomed ? 18 : 14;
   const titleFontSize = zoomLevel >= 150 ? 16 : zoomLevel >= 125 ? 15.5 : 15;
 
-  const bgColor =
-    tile.section === 'helpful'
-      ? BG_HELPFUL
-      : tile.section === 'wissenswertes'
-        ? BG_WISSENSWERTES
-        : BG_OFFERS;
+  const bgColor = resolveTileBackgroundColor(tile);
 
   return (
     <div

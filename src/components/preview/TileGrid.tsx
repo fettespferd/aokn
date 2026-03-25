@@ -11,7 +11,8 @@ interface TileGridProps {
 }
 
 export function TileGrid({ tiles, expandedTileId, onToggle, zoomLevel = 100 }: TileGridProps) {
-  const visibleTiles = tiles.filter((t) => t.isVisible).sort((a, b) => a.sortOrder - b.sortOrder);
+  // Reihenfolge kommt von getTilesForPreview (inkl. Lebensphase) — nicht erneut nach tile.sortOrder sortieren
+  const visibleTiles = tiles.filter((t) => t.isVisible);
   const expandedTile = visibleTiles.find((t) => t.id === expandedTileId);
   const singleColumn = zoomLevel >= 150;
   const isZoomed = zoomLevel >= 125;
